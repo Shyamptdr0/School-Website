@@ -2,9 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { BlurFade } from "@/components/magicui/blur-fade";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 export default function Awards() {
     const [photos, setPhotos] = useState([]);
+    const [openPhoto, setOpenPhoto] = useState(null); // store clicked photo for modal
 
     const fetchPhotos = async () => {
         try {
@@ -25,21 +28,29 @@ export default function Awards() {
             <h1 className="text-2xl font-bold mb-6">🏆 Award List</h1>
 
             {photos.length === 0 ? (
-                <p>No photos available.</p>
+                <p>No awards available.</p>
             ) : (
                 <section id="photos">
-                    <div className="columns-2 gap-4 sm:columns-3">
+                    <div className="grid md:grid-cols-3 gap-4">
                         {photos.map((p, idx) => (
                             <BlurFade key={p._id} delay={0.25 + idx * 0.05} inView>
-                                <div className="mb-4 rounded-lg overflow-hidden border shadow-sm bg-white">
-                                    <img
-                                        src={p.imageUrl}
-                                        alt={p.title}
-                                        className="w-full object-contain"
-                                    />
-                                    <div className="p-2">
-                                        <h2 className="font-medium">{p.title}</h2>
-                                        <Description text={p.description || ""} />
+                                <div className="border rounded-lg shadow-sm bg-white overflow-hidden cursor-pointer"  onClick={() => setOpenPhoto(p)}>
+                                    {p.imageUrl && (
+                                        <img
+                                            src={p.imageUrl}
+                                            alt={p.title}
+                                            className="w-full h-48 object-cover"
+                                        />
+                                    )}
+                                    <div className="p-4">
+                                        <h2 className="font-medium text-lg">{p.title}</h2>
+                                        <Button
+                                            variant="link"
+                                            className="text-blue-500 mt-2 p-0 cursor-pointer"
+                                            onClick={() => setOpenPhoto(p)}
+                                        >
+                                            Read more
+                                        </Button>
                                     </div>
                                 </div>
                             </BlurFade>
@@ -47,28 +58,34 @@ export default function Awards() {
                     </div>
                 </section>
             )}
+
+            {/* Modal */}
+            {/* Modal */}
+            <Dialog open={!!openPhoto} onOpenChange={() => setOpenPhoto(null)}>
+                <DialogContent className="max-w-lg w-full">
+                    <DialogHeader>
+                        <DialogTitle>{openPhoto?.title}</DialogTitle>
+                        <DialogClose className="absolute right-4 top-4 text-gray-500 hover:text-gray-800">
+                        </DialogClose>
+                    </DialogHeader>
+
+                    {openPhoto?.imageUrl && (
+                        <img
+                            src={openPhoto.imageUrl}
+                            alt={openPhoto.title}
+                            className="w-full h-64 object-cover rounded mb-4"
+                        />
+                    )}
+
+                    {/* Scrollable description */}
+                    <div className="max-h-48 overflow-y-auto p-2 border rounded bg-gray-50">
+                        <p className="text-sm text-gray-700 whitespace-pre-line leading-relaxed">
+                            {openPhoto?.description || "No description available."}
+                        </p>
+                    </div>
+                </DialogContent>
+            </Dialog>
+
         </div>
-    );
-}
-
-// Reuse same Description component for "Read more"
-function Description({ text }) {
-    const [expanded, setExpanded] = useState(false);
-    const words = text.split(" ");
-    const truncated = words.slice(0, 50).join(" ");
-
-    if (words.length <= 50)
-        return <p className="text-sm text-gray-600 whitespace-pre-line">{text}</p>;
-
-    return (
-        <p className="text-sm text-gray-600 whitespace-pre-line">
-            {expanded ? text : truncated + "..."}{" "}
-            <button
-                onClick={() => setExpanded(!expanded)}
-                className="text-blue-500 underline"
-            >
-                {expanded ? "Show less" : "Read more"}
-            </button>
-        </p>
     );
 }

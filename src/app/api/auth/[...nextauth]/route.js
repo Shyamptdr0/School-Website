@@ -17,8 +17,6 @@ export const authOptions = {
 
                 try {
                     await connectMongoose();
-
-                    // Find krishna-academy-admin by email instead of name
                     const admin = await Admin.findOne({ email });
                     if (!admin) return null;
 
@@ -37,13 +35,30 @@ export const authOptions = {
             },
         }),
     ],
+
     session: {
         strategy: "jwt",
     },
+
+    cookies: {
+        sessionToken: {
+            name: `next-auth.session-token`,
+            options: {
+                httpOnly: true,
+                sameSite: "lax",
+                path: "/",
+                secure: process.env.NODE_ENV === "production",
+                maxAge: undefined, // 🔑 makes it a session cookie → expires on tab/browser close
+            },
+        },
+    },
+
     secret: process.env.NEXTAUTH_SECRET,
+
     pages: {
         signIn: "/krishna-academy-admin/login",
     },
+
     callbacks: {
         async jwt({ token, user }) {
             if (user) {

@@ -1,24 +1,25 @@
 "use client";
-import { useEffect } from "react";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import jwt from "jsonwebtoken";
+import { useEffect } from "react";
 
 export default function ProtectedRoute({ children }) {
+    const { status } = useSession();
     const router = useRouter();
 
     useEffect(() => {
-        const token = localStorage.getItem("adminToken");
-        if (!token) {
-            router.push("/admin/login");
-        } else {
-            try {
-                jwt.verify(token, process.env.NEXT_PUBLIC_JWT_SECRET);
-            } catch {
-                localStorage.removeItem("adminToken");
-                router.push("/admin/login");
-            }
+        if (status === "unauthenticated") {
+            router.replace("/krishna-academy-admin/login");
         }
-    }, [router]);
+    }, [status, router]);
+
+    if (status === "loading") {
+        return <p>Loading...</p>; // could be a spinner
+    }
+
+    if (status === "unauthenticated") {
+        return null; // prevent flicker
+    }
 
     return <>{children}</>;
 }

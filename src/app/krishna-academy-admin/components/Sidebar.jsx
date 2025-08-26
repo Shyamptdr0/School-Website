@@ -194,14 +194,16 @@ export default function SidebarDashboard() {
                         <SidebarMenu>
                             <SidebarMenuItem>
                                 <SidebarMenuButton
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        signOut();
-                                    }}
-                                    className="text-white bg-sky-800 hover:bg-sky-950 hover:text-white cursor-pointer"
+                                    onClick={() =>
+                                        signOut({
+                                            redirect: true,
+                                            callbackUrl: "/krishna-academy-admin/login",
+                                        })
+                                    }
+                                    className="flex items-center gap-2 px-4 py-2 bg-sky-800 text-white rounded-md hover:bg-sky-900 hover:text-white cursor-pointer"
                                 >
                                     <LogOut className="h-5 w-5" />
-                                    <span>Logout</span>
+                                    Logout
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
                         </SidebarMenu>
