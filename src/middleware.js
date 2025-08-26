@@ -6,7 +6,7 @@ export async function middleware(req) {
     const { pathname } = req.nextUrl;
 
     // Skip static files & Next internals
-    if (pathname.startsWith("/_next") || pathname.startsWith("/favicon.ico")) {
+    if (pathname.startsWith("/_next") || pathname.startsWith("/logo1.webp")) {
         return NextResponse.next();
     }
 
