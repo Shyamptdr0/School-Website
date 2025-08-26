@@ -1,0 +1,21 @@
+import { NextResponse } from "next/server";
+import { connectMongoose } from "@/lib/mongodb.js";
+import Faculty from "@/models/Faculty";
+import cloudinary from "@/lib/cloudinary";
+
+// ✅ GET all faculty
+export async function GET() {
+    await connectMongoose();
+    const data = await Faculty.find();
+    return NextResponse.json(data);
+}
+
+// ✅ CREATE new faculty
+export async function POST(req) {
+    await connectMongoose();
+    const body = await req.json();
+    const { name, profession, imageUrl, imageId } = body;
+    const faculty = new Faculty({ name, profession, imageUrl, imageId });
+    await faculty.save();
+    return NextResponse.json(faculty);
+}
