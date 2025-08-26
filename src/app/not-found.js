@@ -1,4 +1,5 @@
 import './globals.css'
+import Link from "next/link";
 
 export default function NotFound() {
     return (
@@ -8,12 +9,12 @@ export default function NotFound() {
             <p className="text-gray-600 mt-2">
                 Sorry, the page you’re looking for doesn’t exist or has been moved.
             </p>
-            <a
+            <Link
                 href="/"
                 className="mt-6 px-6 py-3 bg-sky-700 text-white rounded-lg shadow-md hover:bg-sky-800 transition"
             >
                 Back to Home
-            </a>
+            </Link>
         </div>
     );
 }
