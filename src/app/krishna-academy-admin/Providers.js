@@ -5,17 +5,20 @@ import { useEffect } from "react";
 
 export function AuthProvider({ children }) {
     useEffect(() => {
-        // When logging in, mark this tab as active
-        if (!sessionStorage.getItem("admin-active")) {
-            sessionStorage.setItem("admin-active", "true");
-        }
+        // Mark this tab as active
+        sessionStorage.setItem("admin-active", "true");
 
-        // On refresh: if no flag in sessionStorage, force logout
-        if (!sessionStorage.getItem("admin-active")) {
-            signOut({ callbackUrl: "/krishna-academy-admin/login" });
-        }
+        // On tab close → clear flag + force logout
+        const handleUnload = () => {
+            sessionStorage.removeItem("admin-active");
+            // Broadcast logout to other tabs
+            const bc = new BroadcastChannel("auth");
+            bc.postMessage("logout");
+            bc.close();
+        };
+        window.addEventListener("beforeunload", handleUnload);
 
-        // Optional: sync logout across tabs
+        // Listen for logout events from other tabs
         const bc = new BroadcastChannel("auth");
         bc.onmessage = (event) => {
             if (event.data === "logout") {
@@ -24,6 +27,7 @@ export function AuthProvider({ children }) {
         };
 
         return () => {
+            window.removeEventListener("beforeunload", handleUnload);
             bc.close();
         };
     }, []);
