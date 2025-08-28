@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { signOut, useSession } from "next-auth/react";
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import {
     Sidebar,
     SidebarContent,
@@ -15,7 +15,6 @@ import {
     SidebarProvider,
     SidebarTrigger,
 } from "@/components/ui/sidebar";
-
 import {
     Home,
     LogOut,
@@ -35,23 +34,31 @@ import Image from "next/image";
 import logo from "@/assets/logo.png";
 import AllPages from "@/app/krishna-academy-admin/components/AllPages";
 
-// Example dummy pages
-const AboutPage = ({ page }) => (
-    <div className="p-4">
-        <AllPages />
-    </div>
-);
-
 export default function SidebarDashboard() {
-    const { data: session } = useSession();
+    const router = useRouter();
     const [activePage, setActivePage] = useState("Home");
     const [openMenus, setOpenMenus] = useState({});
+    const [token, setToken] = useState(null);
+
+    useEffect(() => {
+        const storedToken = sessionStorage.getItem("admin_token");
+        setToken(storedToken);
+
+        if (!storedToken) {
+            router.replace("/krishna-academy-admin/login");
+        }
+    }, [router]);
+
+    const handleLogout = () => {
+        sessionStorage.removeItem("admin_token");
+        router.replace("/krishna-academy-admin/login");
+    };
+
 
     const toggleMenu = (title) => {
         setOpenMenus((prev) => ({ ...prev, [title]: !prev[title] }));
     };
 
-    // Sidebar items with submenu support
     const items = [
         { title: "Home", icon: Home },
         { title: "Mandatory Disclosure", icon: Files },
@@ -94,16 +101,14 @@ export default function SidebarDashboard() {
         { title: "Contact", icon: PhoneCall },
     ];
 
-    // Recursive menu renderer
     const renderMenu = (menuItems) =>
         menuItems.map((item) => {
             if (typeof item === "string") {
-                // ✅ leaf node (string)
                 return (
                     <SidebarMenuItem key={item}>
                         <SidebarMenuButton
                             onClick={(e) => {
-                                e.preventDefault(); // ⛔ prevent refresh/go home
+                                e.preventDefault();
                                 setActivePage(item);
                             }}
                             className="cursor-pointer pl-6"
@@ -115,7 +120,6 @@ export default function SidebarDashboard() {
             }
 
             if (item.children) {
-                // ✅ menu with children
                 const isOpen = openMenus[item.title] || false;
                 return (
                     <SidebarMenuItem key={item.title}>
@@ -145,12 +149,11 @@ export default function SidebarDashboard() {
                 );
             }
 
-            // ✅ normal menu item (no children)
             return (
                 <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton
                         onClick={(e) => {
-                            e.preventDefault(); // ⛔ prevent refresh/go home
+                            e.preventDefault();
                             setActivePage(item.title);
                         }}
                         className="cursor-pointer"
@@ -194,12 +197,7 @@ export default function SidebarDashboard() {
                         <SidebarMenu>
                             <SidebarMenuItem>
                                 <SidebarMenuButton
-                                    onClick={() =>
-                                        signOut({
-                                            redirect: true,
-                                            callbackUrl: "/krishna-academy-admin/login",
-                                        })
-                                    }
+                                    onClick={handleLogout}
                                     className="flex items-center gap-2 px-4 py-2 bg-sky-800 text-white rounded-md hover:bg-sky-900 hover:text-white cursor-pointer"
                                 >
                                     <LogOut className="h-5 w-5" />
@@ -218,7 +216,6 @@ export default function SidebarDashboard() {
                             <h1 className="text-2xl font-bold">{activePage}</h1>
                             <SidebarTrigger />
                         </div>
-                        {/* ✅ Load dynamic content */}
                         <AllPages activePage={activePage} />
                     </div>
                 </main>

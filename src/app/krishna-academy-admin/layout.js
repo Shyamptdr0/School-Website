@@ -1,4 +1,3 @@
-// app/krishna-academy-admin/layout.jsx
 import "../globals.css";
 import { AuthProvider } from "./Providers";
 
@@ -10,7 +9,7 @@ export default function AdminLayout({ children }) {
         <html lang="en">
         <body style={{ fontFamily: "sans-serif" }}>
         <AuthProvider>
-            {children} {/* All admin pages go here */}
+            {children}
         </AuthProvider>
         </body>
         </html>
