@@ -3,51 +3,62 @@
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
 
 export default function LoginForm() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
+
     const router = useRouter();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError("");
 
-        const res = await signIn("credentials", {
-            email,
-            password,
-            redirect: false,
-        });
+        try {
+            const res = await signIn("credentials", {
+                email,
+                password,
+                redirect: false,
+            });
 
-        if (res.error) {
-            setError("Invalid credentials");
-            return;
+            if (res.error) {
+                setError("Invalid Credentials");
+                return;
+            }
+
+            router.replace("/krishna-academy-admin/dashboard");
+        } catch (error) {
+            console.log(error);
         }
-
-        // ✅ Per-tab login
-        sessionStorage.setItem("admin-active", "true");
-
-        router.replace("/krishna-academy-admin/dashboard");
     };
 
     return (
-        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-            <input
-                type="text"
-                placeholder="Email"
-                onChange={(e) => setEmail(e.target.value)}
-                className="border p-2 rounded"
-            />
-            <input
-                type="password"
-                placeholder="Password"
-                onChange={(e) => setPassword(e.target.value)}
-                className="border p-2 rounded"
-            />
-            <Button type="submit">Login</Button>
-            {error && <p className="text-red-500">{error}</p>}
-        </form>
+        <div className="grid place-items-center h-screen">
+            <div className="shadow-lg p-5 rounded-lg border-t-4 border-green-400">
+                <h1 className="text-xl font-bold my-4">Login</h1>
+
+                <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+                    <input
+                        onChange={(e) => setEmail(e.target.value)}
+                        type="text"
+                        placeholder="Email"
+                    />
+                    <input
+                        onChange={(e) => setPassword(e.target.value)}
+                        type="password"
+                        placeholder="Password"
+                    />
+                    <button className="bg-green-600 text-white font-bold cursor-pointer px-6 py-2">
+                        Login
+                    </button>
+                    {error && (
+                        <div className="bg-red-500 text-white w-fit text-sm py-1 px-3 rounded-md mt-2">
+                            {error}
+                        </div>
+                    )}
+
+                </form>
+            </div>
+        </div>
     );
 }
