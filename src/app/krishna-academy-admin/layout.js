@@ -1,4 +1,5 @@
-import "../globals.css"
+// app/krishna-academy-admin/layout.jsx
+import "../globals.css";
 import { AuthProvider } from "./Providers";
 
 export const metadata = { title: "Admin Panel" };
@@ -9,9 +10,8 @@ export default function AdminLayout({ children }) {
         <html lang="en">
         <body style={{ fontFamily: "sans-serif" }}>
         <AuthProvider>
-            {children}
+            {children} {/* All admin pages go here */}
         </AuthProvider>
-
         </body>
         </html>
     );

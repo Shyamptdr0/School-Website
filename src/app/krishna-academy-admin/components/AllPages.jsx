@@ -1,10 +1,10 @@
-import HomePage from "@/app/krishna-academy-admin/Pages/Home/page";
-import MandatoryPage from "@/app/krishna-academy-admin/Pages/Mandatory/page";
-import FacultiesPage from "@/app/krishna-academy-admin/Pages/Faculties/page";
-import ContactPage from "@/app/krishna-academy-admin/Pages/Contact/page";
-import CurriculumUpload from "@/app/krishna-academy-admin/Pages/Curricullum/page";
-import PhotoGallery from "@/app/krishna-academy-admin/Pages/Gallery/photo/page";
-import AwardList from "@/app/krishna-academy-admin/Pages/Achievements/AwardList/page";
+import HomePage from "@/app/krishna-academy-admin/components/Pages/Home/page";
+import MandatoryPage from "@/app/krishna-academy-admin/components/Pages/Mandatory/page";
+import FacultiesPage from "@/app/krishna-academy-admin/components/Pages/Faculties/page";
+import ContactPage from "@/app/krishna-academy-admin/components/Pages/Contact/page";
+import CurriculumUpload from "@/app/krishna-academy-admin/components/Pages/Curricullum/page";
+import PhotoGallery from "@/app/krishna-academy-admin/components/Pages/Gallery/photo/page";
+import AwardList from "@/app/krishna-academy-admin/components/Pages/Achievements/AwardList/page";
 
 export default function AllPages({ activePage }) {
     switch (activePage) {
