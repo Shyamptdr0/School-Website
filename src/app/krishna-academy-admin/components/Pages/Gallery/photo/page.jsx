@@ -1,5 +1,4 @@
 "use client";
-
 import { useEffect, useState, useRef } from "react";
 
 export default function PhotoGallery() {
@@ -10,10 +9,12 @@ export default function PhotoGallery() {
 
     const [title, setTitle] = useState("");
     const [file, setFile] = useState(null);
+    const [preview, setPreview] = useState(null); // 👈 preview for new upload
 
     const [editId, setEditId] = useState(null);
     const [editTitle, setEditTitle] = useState("");
     const [editFile, setEditFile] = useState(null);
+    const [editPreview, setEditPreview] = useState(null); // 👈 preview for edit
     const [editCategory, setEditCategory] = useState("");
 
     const [confirmDeleteId, setConfirmDeleteId] = useState(null);
@@ -105,6 +106,7 @@ export default function PhotoGallery() {
         if (data.success) {
             setTitle("");
             setFile(null);
+            setPreview(null);
             setSelectedCategory("");
             fileRef.current.value = "";
             fetchPhotos();
@@ -134,6 +136,7 @@ export default function PhotoGallery() {
             setEditTitle("");
             setEditCategory("");
             setEditFile(null);
+            setEditPreview(null);
             if (editFileRef.current) editFileRef.current.value = "";
             fetchPhotos();
         } else {
@@ -230,11 +233,25 @@ export default function PhotoGallery() {
                 <input
                     type="file"
                     accept="image/*"
-                    onChange={(e) => setFile(e.target.files[0])}
+                    onChange={(e) => {
+                        const file = e.target.files[0];
+                        setFile(file);
+                        if (file) setPreview(URL.createObjectURL(file));
+                    }}
                     ref={fileRef}
                     className="border p-2 rounded"
                     required
                 />
+
+                {/* 👇 Preview before upload */}
+                {preview && (
+                    <img
+                        src={preview}
+                        alt="Preview"
+                        className="w-40 h-40 object-cover rounded border mb-2"
+                    />
+                )}
+
                 <button
                     type="submit"
                     disabled={loading}
@@ -273,10 +290,24 @@ export default function PhotoGallery() {
                                     <input
                                         type="file"
                                         accept="image/*"
-                                        onChange={(e) => setEditFile(e.target.files[0])}
+                                        onChange={(e) => {
+                                            const file = e.target.files[0];
+                                            setEditFile(file);
+                                            if (file) setEditPreview(URL.createObjectURL(file));
+                                        }}
                                         ref={editFileRef}
                                         className="border p-1 rounded w-full mb-1"
                                     />
+
+                                    {/* 👇 Preview while editing */}
+                                    {editPreview && (
+                                        <img
+                                            src={editPreview}
+                                            alt="Edit Preview"
+                                            className="w-32 h-32 object-cover rounded border mb-2"
+                                        />
+                                    )}
+
                                     <button
                                         onClick={() => handleUpdate(p._id)}
                                         disabled={loading}
@@ -285,7 +316,10 @@ export default function PhotoGallery() {
                                         {loading ? "Saving..." : "Save"}
                                     </button>
                                     <button
-                                        onClick={() => setEditId(null)}
+                                        onClick={() => {
+                                            setEditId(null);
+                                            setEditPreview(null);
+                                        }}
                                         className="bg-gray-400 text-white px-2 py-1 rounded"
                                     >
                                         Cancel
@@ -301,6 +335,7 @@ export default function PhotoGallery() {
                                                 setEditId(p._id);
                                                 setEditTitle(p.title);
                                                 setEditCategory(p.category?._id || "");
+                                                setEditPreview(null);
                                             }}
                                             className="text-blue-500"
                                         >

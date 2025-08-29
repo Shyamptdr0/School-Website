@@ -1,16 +1,13 @@
 import { NextResponse } from "next/server";
-import { connectMongoose } from "@/lib/mongodb.js";
+import { connectMongoose } from "@/lib/mongodb";
 import Faculty from "@/models/Faculty";
-import cloudinary from "@/lib/cloudinary";
 
-// ✅ GET all faculty
 export async function GET() {
     await connectMongoose();
     const data = await Faculty.find();
     return NextResponse.json(data);
 }
 
-// ✅ CREATE new faculty
 export async function POST(req) {
     await connectMongoose();
     const body = await req.json();

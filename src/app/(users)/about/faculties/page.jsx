@@ -24,10 +24,10 @@ export default function Faculties() {
                 {faculties.map((faculty) => (
                     <div
                         key={faculty._id}
-                        className="border rounded-md shadow-sm w-44 flex flex-col items-center p-2 bg-white"
+                        className="border rounded-md shadow-sm w-55 flex flex-col items-center p-2 bg-white"
                     >
                         {/* Image container */}
-                        <div className="w-40 h-48 overflow-hidden rounded-md border">
+                        <div className="w-50 h-65 overflow-hidden rounded-md border">
                             <Image
                                 src={faculty.imageUrl }
                                 alt={faculty.name}

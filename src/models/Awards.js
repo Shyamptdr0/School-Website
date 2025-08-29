@@ -1,13 +1,12 @@
-import mongoose from "mongoose";
+// src/models/Awards.js
+import mongoose from "mongoose"; // ← ADD THIS
 
-const AwardsSchema = new mongoose.Schema(
-    {
-        title: { type: String, required: true },
-        description: { type: String, default: "" },
-        imageUrl: { type: String, required: true },
-        publicId: { type: String, required: true },
-    },
-    { timestamps: true }
-);
+const AwardsSchema = new mongoose.Schema({
+    title: { type: String, required: true },
+    description: { type: String, default: "" },
+    imageUrls: { type: [String], default: [] },
+    publicIds: { type: [String], default: [] },
+}, { timestamps: true });
 
-export default mongoose.models.Awards || mongoose.model("Awards", AwardsSchema);
+const Awards = mongoose.models.Awards || mongoose.model("Awards", AwardsSchema);
+export default Awards;

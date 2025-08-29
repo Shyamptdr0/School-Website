@@ -36,9 +36,23 @@ import AllPages from "@/app/krishna-academy-admin/components/AllPages";
 
 export default function SidebarDashboard() {
     const router = useRouter();
-    const [activePage, setActivePage] = useState("Home");
+
+    // Load active page from sessionStorage or default to "Home"
+    const [activePage, setActivePage] = useState(() => {
+        if (typeof window !== "undefined") {
+            return sessionStorage.getItem("activePage") || "Home";
+        }
+        return "Home";
+    });
+
     const [openMenus, setOpenMenus] = useState({});
     const [token, setToken] = useState(null);
+
+    // Persist active page in sessionStorage
+    const handleSetActivePage = (page) => {
+        setActivePage(page);
+        sessionStorage.setItem("activePage", page);
+    };
 
     useEffect(() => {
         const storedToken = sessionStorage.getItem("admin_token");
@@ -53,7 +67,6 @@ export default function SidebarDashboard() {
         sessionStorage.removeItem("admin_token");
         router.replace("/krishna-academy-admin/login");
     };
-
 
     const toggleMenu = (title) => {
         setOpenMenus((prev) => ({ ...prev, [title]: !prev[title] }));
@@ -107,9 +120,10 @@ export default function SidebarDashboard() {
                 return (
                     <SidebarMenuItem key={item}>
                         <SidebarMenuButton
+                            type="button"
                             onClick={(e) => {
                                 e.preventDefault();
-                                setActivePage(item);
+                                handleSetActivePage(item);
                             }}
                             className="cursor-pointer pl-6"
                         >
@@ -124,6 +138,7 @@ export default function SidebarDashboard() {
                 return (
                     <SidebarMenuItem key={item.title}>
                         <SidebarMenuButton
+                            type="button"
                             onClick={(e) => {
                                 e.preventDefault();
                                 toggleMenu(item.title);
@@ -141,9 +156,7 @@ export default function SidebarDashboard() {
                             )}
                         </SidebarMenuButton>
                         {isOpen && (
-                            <SidebarMenu className="ml-4">
-                                {renderMenu(item.children)}
-                            </SidebarMenu>
+                            <SidebarMenu className="ml-4">{renderMenu(item.children)}</SidebarMenu>
                         )}
                     </SidebarMenuItem>
                 );
@@ -152,9 +165,10 @@ export default function SidebarDashboard() {
             return (
                 <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton
+                        type="button"
                         onClick={(e) => {
                             e.preventDefault();
-                            setActivePage(item.title);
+                            handleSetActivePage(item.title);
                         }}
                         className="cursor-pointer"
                     >
@@ -186,9 +200,7 @@ export default function SidebarDashboard() {
                             </SidebarGroupLabel>
 
                             <SidebarGroupContent>
-                                <SidebarMenu className="mt-4">
-                                    {renderMenu(items)}
-                                </SidebarMenu>
+                                <SidebarMenu className="mt-4">{renderMenu(items)}</SidebarMenu>
                             </SidebarGroupContent>
                         </SidebarGroup>
                     </SidebarContent>
@@ -197,6 +209,7 @@ export default function SidebarDashboard() {
                         <SidebarMenu>
                             <SidebarMenuItem>
                                 <SidebarMenuButton
+                                    type="button"
                                     onClick={handleLogout}
                                     className="flex items-center gap-2 px-4 py-2 bg-sky-800 text-white rounded-md hover:bg-sky-900 hover:text-white cursor-pointer"
                                 >

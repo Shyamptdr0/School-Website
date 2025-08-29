@@ -1,31 +1,51 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogFooter,
+} from "@/components/ui/dialog";
+import {
+    Card,
+    CardContent,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card";
 
 export default function AwardList() {
     const [photos, setPhotos] = useState([]);
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
-    const [file, setFile] = useState(null);
-    const [preview, setPreview] = useState(null); // 👈 preview state
+    const [files, setFiles] = useState([]);
+    const [previews, setPreviews] = useState([]);
+    const [loading, setLoading] = useState(false);
 
+    // Edit states
+    const [editOpen, setEditOpen] = useState(false);
     const [editId, setEditId] = useState(null);
     const [editTitle, setEditTitle] = useState("");
     const [editDescription, setEditDescription] = useState("");
-    const [editFile, setEditFile] = useState(null);
-    const [editPreview, setEditPreview] = useState(null); // 👈 preview for edit
-    const [confirmDeleteId, setConfirmDeleteId] = useState(null);
-    const [loading, setLoading] = useState(false);
+    const [editFiles, setEditFiles] = useState([]);
+    const [editPreviews, setEditPreviews] = useState([]);
+    const [deletedImages, setDeletedImages] = useState([]);
 
-    const fileRef = useRef();
-    const editFileRef = useRef();
+    // Delete states
+    const [deleteOpen, setDeleteOpen] = useState(false);
+    const [deleteId, setDeleteId] = useState(null);
 
     // Fetch awards
     const fetchPhotos = async () => {
         try {
             const res = await fetch("/api/award");
             const data = await res.json();
-            setPhotos(data);
+            setPhotos(data || []);
         } catch (err) {
             console.error(err);
         }
@@ -35,34 +55,36 @@ export default function AwardList() {
         fetchPhotos();
     }, []);
 
-    const resetEditState = () => {
-        setEditId(null);
-        setEditTitle("");
-        setEditDescription("");
-        setEditFile(null);
-        setEditPreview(null);
-        if (editFileRef.current) editFileRef.current.value = "";
+    // Reset form
+    const resetForm = () => {
+        setTitle("");
+        setDescription("");
+        setFiles([]);
+        setPreviews([]);
     };
 
-    // Upload
+    // Remove file from upload preview
+    const removeFile = (index) => {
+        setFiles((prev) => prev.filter((_, i) => i !== index));
+        setPreviews((prev) => prev.filter((_, i) => i !== index));
+    };
+
+    // Upload new award
     const handleUpload = async (e) => {
         e.preventDefault();
-        if (!file) return alert("Please select an image");
+        if (files.length === 0) return alert("Please select at least one image");
+
         setLoading(true);
         const formData = new FormData();
         formData.append("title", title);
         formData.append("description", description || "");
-        formData.append("file", file);
+        files.forEach((file) => formData.append("files", file));
 
         try {
             const res = await fetch("/api/award", { method: "POST", body: formData });
             const data = await res.json();
             if (data.success) {
-                setTitle("");
-                setDescription("");
-                setFile(null);
-                setPreview(null); // reset preview
-                if (fileRef.current) fileRef.current.value = "";
+                resetForm();
                 fetchPhotos();
             } else {
                 alert(data.error);
@@ -74,21 +96,35 @@ export default function AwardList() {
         }
     };
 
-    // Update
-    const handleUpdate = async (id) => {
-        if (!id) return;
+    // Open edit dialog
+    const openEdit = (p) => {
+        setEditId(p._id);
+        setEditTitle(p.title);
+        setEditDescription(p.description || "");
+        setEditFiles([]);
+        setEditPreviews([]);
+        setDeletedImages([]);
+        setEditOpen(true);
+    };
+
+    // Save edited award
+    const handleEditSave = async () => {
+        if (!editId) return;
         setLoading(true);
+
         const formData = new FormData();
-        formData.append("id", id);
+        formData.append("id", editId);
         formData.append("title", editTitle);
         formData.append("description", editDescription || "");
-        if (editFile) formData.append("file", editFile);
+        editFiles.forEach((file) => formData.append("files", file));
+        deletedImages.forEach((url) => formData.append("deletedImages[]", url));
 
         try {
             const res = await fetch("/api/award", { method: "PUT", body: formData });
             const data = await res.json();
             if (data.success) {
-                resetEditState();
+                setEditOpen(false);
+                setDeletedImages([]);
                 fetchPhotos();
             } else {
                 alert(data.error);
@@ -100,220 +136,278 @@ export default function AwardList() {
         }
     };
 
-    // Delete
-    const handleDelete = async (id) => {
-        if (!id) return;
+    // Open delete dialog
+    const openDelete = (id) => {
+        setDeleteId(id);
+        setDeleteOpen(true);
+    };
+
+    // Confirm delete
+    const confirmDelete = async () => {
+        if (!deleteId) return;
         setLoading(true);
         try {
-            const res = await fetch(`/api/award?id=${id}`, { method: "DELETE" });
+            const res = await fetch(`/api/award?id=${deleteId}`, { method: "DELETE" });
             const data = await res.json();
-            if (data.success) {
-                setConfirmDeleteId(null);
-                fetchPhotos();
-            } else {
-                alert(data.error);
-            }
+            if (data.success) fetchPhotos();
+            else alert(data.error);
         } catch (err) {
             alert("Delete failed: " + err.message);
         } finally {
             setLoading(false);
+            setDeleteOpen(false);
+            setDeleteId(null);
         }
     };
 
     return (
-        <div className="p-6">
-            <h1 className="text-xl font-bold mb-4">🏆 Sports Gallery Management</h1>
+        <div className="p-6 space-y-6 relative">
+            {loading && (
+                <div className="absolute inset-0 bg-black/30 flex items-center justify-center z-50">
+                    <span className="text-white text-lg font-bold">Loading...</span>
+                </div>
+            )}
+
+            <h1 className="text-xl font-bold">Award List Management</h1>
 
             {/* Upload Form */}
-            <form onSubmit={handleUpload} className="flex flex-col gap-2 mb-6">
-                <input
-                    type="text"
-                    placeholder="Photo Title"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    className="border p-2 rounded"
-                />
-                <textarea
-                    placeholder="Description"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    className="border p-2 rounded"
-                />
-                <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => {
-                        const f = e.target.files[0];
-                        setFile(f);
-                        if (f) setPreview(URL.createObjectURL(f));
-                        else setPreview(null);
-                    }}
-                    ref={fileRef}
-                    className="border p-2 rounded"
-                />
-
-                {/* Preview new upload */}
-                {preview && (
-                    <img
-                        src={preview}
-                        alt="Preview"
-                        className="w-40 h-40 object-cover rounded border"
+            <Card>
+                <CardHeader>
+                    <CardTitle>Upload Awards</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                    <Input
+                        placeholder="Photo Title"
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
                     />
-                )}
+                    <Textarea
+                        placeholder="Description"
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        className="max-h-32 overflow-y-auto resize-none"
+                    />
+                    <div className="space-y-2">
+                        <Button
+                            type="button"
+                            onClick={() => document.getElementById("fileInput")?.click()}
+                            className="bg-sky-700 text-white"
+                        >
+                            + Add Image
+                        </Button>
+                        <input
+                            id="fileInput"
+                            type="file"
+                            accept="image/*"
+                            hidden
+                            multiple
+                            onChange={(e) => {
+                                const selectedFiles = e.target.files;
+                                if (selectedFiles) {
+                                    const filesArray = Array.from(selectedFiles);
+                                    setFiles((prev) => [...prev, ...filesArray]);
+                                    setPreviews((prev) => [
+                                        ...prev,
+                                        ...filesArray.map((f) => URL.createObjectURL(f)),
+                                    ]);
+                                }
+                            }}
+                        />
+                    </div>
 
-                <button
-                    type="submit"
-                    disabled={loading}
-                    className="bg-sky-800 text-white px-4 py-2 rounded disabled:opacity-50"
-                >
-                    {loading ? "Uploading..." : "Upload"}
-                </button>
-            </form>
+                    <div className="flex gap-2 flex-wrap">
+                        {previews.map((src, i) => (
+                            <div key={i} className="relative">
+                                <img
+                                    src={src}
+                                    alt="preview"
+                                    className="w-24 h-24 object-cover rounded border"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => removeFile(i)}
+                                    className="absolute -top-2 -right-2 bg-red-600 text-white w-6 h-6 rounded-full"
+                                >
+                                    ✕
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+                </CardContent>
+                <CardFooter className="space-x-2">
+                    <Button onClick={handleUpload} disabled={loading} className="bg-green-700 text-white">
+                        {loading ? "Uploading..." : "Upload"}
+                    </Button>
+                    <Button type="button" variant="secondary" onClick={resetForm} disabled={loading}>
+                        Reset
+                    </Button>
+                </CardFooter>
+            </Card>
 
             {/* Gallery */}
             <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {photos.map((p) => (
-                    <div key={p._id} className="border rounded shadow-md overflow-hidden relative">
-                        <img src={p.imageUrl} alt={p.title} className="w-full h-48 object-cover" />
-                        <div className="p-2">
-                            {editId === p._id ? (
-                                <>
-                                    <input
-                                        type="text"
-                                        value={editTitle}
-                                        onChange={(e) => setEditTitle(e.target.value)}
-                                        className="border p-1 rounded w-full mb-1"
-                                        placeholder="Edit title"
-                                    />
-                                    <textarea
-                                        value={editDescription}
-                                        onChange={(e) => setEditDescription(e.target.value)}
-                                        className="border p-1 rounded w-full mb-1"
-                                        placeholder="Edit description"
-                                    />
-                                    <input
-                                        type="file"
-                                        accept="image/*"
-                                        onChange={(e) => {
-                                            const f = e.target.files[0];
-                                            setEditFile(f);
-                                            if (f) setEditPreview(URL.createObjectURL(f));
-                                            else setEditPreview(null);
-                                        }}
-                                        ref={editFileRef}
-                                        className="border p-1 rounded w-full mb-1"
-                                    />
-
-                                    {/* Preview edit upload */}
-                                    {editPreview && (
-                                        <img
-                                            src={editPreview}
-                                            alt="Edit Preview"
-                                            className="w-32 h-32 object-cover rounded border mb-2"
-                                        />
-                                    )}
-
-                                    <div className="flex gap-2 mt-1">
-                                        <button
-                                            onClick={() => handleUpdate(p._id)}
-                                            disabled={loading}
-                                            className="bg-green-600 text-white px-2 py-1 rounded"
-                                        >
-                                            {loading ? "Saving..." : "Save"}
-                                        </button>
-                                        <button
-                                            onClick={resetEditState}
-                                            className="bg-gray-400 text-white px-2 py-1 rounded"
-                                        >
-                                            Cancel
-                                        </button>
-                                    </div>
-                                </>
-                            ) : (
-                                <>
-                                    <h2 className="font-medium">{p.title}</h2>
-                                    <Description text={p.description || ""} />
-                                    <div className="flex justify-between mt-2">
-                                        <button
-                                            onClick={() => {
-                                                setEditId(p._id);
-                                                setEditTitle(p.title);
-                                                setEditDescription(p.description || "");
-                                            }}
-                                            className="text-sky-600"
-                                        >
-                                            Edit
-                                        </button>
-                                        <button
-                                            onClick={() => setConfirmDeleteId(p._id)}
-                                            className="text-red-500"
-                                        >
-                                            Delete
-                                        </button>
-                                    </div>
-                                </>
-                            )}
+                    <Card key={p._id}>
+                        <div className="flex gap-2 overflow-x-auto p-2">
+                            {(p.imageUrls || (p.imageUrl ? [p.imageUrl] : [])).map((url, idx) => (
+                                <img
+                                    key={idx}
+                                    src={url}
+                                    alt={`award ${idx}`}
+                                    className="w-24 h-24 object-cover rounded"
+                                />
+                            ))}
                         </div>
-
-                        {/* Delete Confirmation Overlay */}
-                        {confirmDeleteId === p._id && (
-                            <div className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center">
-                                <div className="bg-white p-4 rounded shadow-md text-center">
-                                    <p className="mb-4">Are you sure you want to delete?</p>
-                                    <button
-                                        onClick={() => handleDelete(p._id)}
-                                        disabled={loading}
-                                        className="bg-red-600 text-white px-3 py-1 rounded mr-2"
-                                    >
-                                        {loading ? "Deleting..." : "Yes"}
-                                    </button>
-                                    <button
-                                        onClick={() => setConfirmDeleteId(null)}
-                                        className="bg-gray-400 text-white px-3 py-1 rounded"
-                                    >
-                                        No
-                                    </button>
-                                </div>
-                            </div>
-                        )}
-                    </div>
+                        <CardHeader>
+                            <CardTitle>{p.title}</CardTitle>
+                        </CardHeader>
+                        <CardContent className="max-h-32 overflow-y-auto">
+                            <p className="text-sm text-gray-600 whitespace-pre-line">{p.description}</p>
+                        </CardContent>
+                        <CardFooter className="flex justify-between">
+                            <Button variant="outline" onClick={() => openEdit(p)}>
+                                Edit
+                            </Button>
+                            <Button variant="destructive" onClick={() => openDelete(p._id)}>
+                                Delete
+                            </Button>
+                        </CardFooter>
+                    </Card>
                 ))}
             </div>
-        </div>
-    );
-}
 
-// Truncate description with Read More + scroll
-function Description({ text }) {
-    const [expanded, setExpanded] = useState(false);
-    const words = text.split(" ");
-    const truncated = words.slice(0, 10).join(" ");
+            {/* Edit Dialog */}
+            <Dialog open={editOpen} onOpenChange={setEditOpen}>
+                <DialogContent className="max-w-lg">
+                    <DialogHeader>
+                        <DialogTitle>Edit Award</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-3">
+                        <Input
+                            value={editTitle}
+                            onChange={(e) => setEditTitle(e.target.value)}
+                            placeholder="Edit title"
+                        />
+                        <Textarea
+                            value={editDescription}
+                            onChange={(e) => setEditDescription(e.target.value)}
+                            placeholder="Edit description"
+                            className="max-h-48 overflow-y-auto resize-none"
+                        />
 
-    if (words.length <= 30) {
-        return (
-            <p className="text-sm text-gray-600 whitespace-pre-line">
-                {text}
-            </p>
-        );
-    }
+                        <Button
+                            type="button"
+                            onClick={() => document.getElementById("editFileInput")?.click()}
+                        >
+                            + Add Image
+                        </Button>
+                        <input
+                            id="editFileInput"
+                            type="file"
+                            hidden
+                            accept="image/*"
+                            multiple
+                            onChange={(e) => {
+                                const selectedFiles = e.target.files;
+                                if (selectedFiles) {
+                                    const filesArray = Array.from(selectedFiles);
+                                    setEditFiles((prev) => [...prev, ...filesArray]);
+                                    setEditPreviews((prev) => [
+                                        ...prev,
+                                        ...filesArray.map((f) => URL.createObjectURL(f)),
+                                    ]);
+                                }
+                            }}
+                        />
 
-    return (
-        <div>
-            {expanded ? (
-                <div className="max-h-32 overflow-y-auto text-sm text-gray-600 whitespace-pre-line p-1 border rounded">
-                    {text}
-                </div>
-            ) : (
-                <p className="text-sm text-gray-600 whitespace-pre-line">
-                    {truncated}...
-                </p>
-            )}
-            <button
-                onClick={() => setExpanded(!expanded)}
-                className="text-sky-600 underline mt-1 text-sm"
-            >
-                {expanded ? "Show less" : "Read more"}
-            </button>
+                        {/* Existing and new images */}
+                        <div className="flex flex-wrap gap-2">
+                            {/* Existing images */}
+                            {(photos.find((p) => p._id === editId)?.imageUrls || []).map((src, i) => (
+                                <div key={`existing-${i}`} className="relative">
+                                    <img
+                                        src={src}
+                                        alt="existing preview"
+                                        className="w-24 h-24 object-cover rounded border"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setDeletedImages((prev) => [...prev, src]);
+                                            setPhotos((prev) =>
+                                                prev.map((p) =>
+                                                    p._id === editId
+                                                        ? { ...p, imageUrls: p.imageUrls.filter((_, idx) => idx !== i) }
+                                                        : p
+                                                )
+                                            );
+                                        }}
+                                        className="absolute -top-2 -right-2 bg-red-600 text-white w-6 h-6 rounded-full"
+                                    >
+                                        ✕
+                                    </button>
+                                </div>
+                            ))}
+
+                            {/* New images */}
+                            {editPreviews.map((src, i) => (
+                                <div key={`new-${i}`} className="relative">
+                                    <img
+                                        src={src}
+                                        alt="edit preview"
+                                        className="w-24 h-24 object-cover rounded border"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setEditFiles((prev) => prev.filter((_, idx) => idx !== i));
+                                            setEditPreviews((prev) => prev.filter((_, idx) => idx !== i));
+                                        }}
+                                        className="absolute -top-2 -right-2 bg-red-600 text-white w-6 h-6 rounded-full"
+                                    >
+                                        ✕
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    <DialogFooter>
+                        <Button
+                            onClick={handleEditSave}
+                            disabled={loading}
+                            className="bg-green-600 text-white"
+                        >
+                            {loading ? "Saving..." : "Save"}
+                        </Button>
+                        <Button variant="secondary" onClick={() => setEditOpen(false)}>
+                            Cancel
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {/* Delete Dialog */}
+            <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+                <DialogContent className="max-w-sm">
+                    <DialogHeader>
+                        <DialogTitle>Confirm Delete</DialogTitle>
+                    </DialogHeader>
+                    <p>Are you sure you want to delete this award?</p>
+                    <DialogFooter className="space-x-2">
+                        <Button
+                            onClick={confirmDelete}
+                            className="bg-red-600 text-white"
+                            disabled={loading}
+                        >
+                            {loading ? "Deleting..." : "Delete"}
+                        </Button>
+                        <Button variant="secondary" onClick={() => setDeleteOpen(false)} disabled={loading}>
+                            Cancel
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }
