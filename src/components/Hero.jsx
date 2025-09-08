@@ -1,19 +1,29 @@
 "use client";
 
-import React from "react";
+import React, {useState, useEffect} from "react";
+import Script from "next/script"; // ✅ Import Script
 import bgImage from "../assets/krishnaPhoto.webp";
 import Image from "next/image";
 import photo from "../assets/photo.webp";
-import { Card, CardFooter } from "@heroui/card";
-import { Button } from "@heroui/button";
+import {Card, CardFooter} from "@heroui/card";
 import image from "../assets/logo1.webp";
-import { AnimatedGridPatternDemo } from "@/components/AnimatedGrid";
+import {AnimatedGridPatternDemo} from "@/components/AnimatedGrid";
+import {FaWhatsapp} from "react-icons/fa";
+import {IoClose} from "react-icons/io5";
+import SchoolChat from "@/components/SchoolChat";
 
 export default function Hero() {
+    const [isOpen, setIsOpen] = useState(false);
+
     return (
         <div className="relative">
-            {/* Animated Grid Background */}
+            {/* ✅ Chatbase Script */}
+            <Script id="chatbase-config" strategy="afterInteractive">
+                {`
 
+               (function(){if(!window.chatbase||window.chatbase("getState")!=="initialized"){window.chatbase=(...arguments)=>{if(!window.chatbase.q){window.chatbase.q=[]}window.chatbase.q.push(arguments)};window.chatbase=new Proxy(window.chatbase,{get(target,prop){if(prop==="q"){return target.q}return(...args)=>target(prop,...args)}})}const onLoad=function(){const script=document.createElement("script");script.src="https://www.chatbase.co/embed.min.js";script.id="IsBMyoA6uIrB_Ee-IstTW";script.domain="www.chatbase.co";document.body.appendChild(script)};if(document.readyState==="complete"){onLoad()}else{window.addEventListener("load",onLoad)}})();
+                `}
+            </Script>
 
             {/* Hero Section */}
             <section
@@ -26,7 +36,7 @@ export default function Hero() {
 
                 <div className="relative z-10 text-center text-white px-6">
                     <h1 className="text-3xl md:text-6xl font-bold mb-6 drop-shadow-lg">
-                        Krishna Academy Dhargoan
+                        Krishna Academy Dhargaon
                     </h1>
                     <a
                         href="/contact"
@@ -59,7 +69,6 @@ export default function Hero() {
                 </div>
             </section>
 
-
             {/* Cards Section */}
             <section className="py-12 px-6 items-center justify-center">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
@@ -73,10 +82,12 @@ export default function Hero() {
                             backgroundPosition: "center",
                         }}
                     >
-                        <div className="absolute inset-0 backdrop-blur-sm bg-black/40 flex flex-col items-center justify-center gap-3">
+                        <div
+                            className="absolute inset-0 backdrop-blur-sm bg-black/40 flex flex-col items-center justify-center gap-3">
                             <h3 className="text-2xl font-bold text-white">Curriculum 9 – 10</h3>
                         </div>
-                        <CardFooter className="cursor-pointer text-center  before:bg-white/10 border-white/20 border-1 overflow-hidden py-2 absolute before:rounded-xl rounded-large bottom-1 w-[calc(100%_-_8px)] shadow-small ml-1 z-10">
+                        <CardFooter
+                            className="cursor-pointer text-center before:bg-white/10 border-white/20 border-1 overflow-hidden py-2 absolute before:rounded-xl rounded-large bottom-1 w-[calc(100%_-_8px)] shadow-small ml-1 z-10">
                             <p className="text-tiny text-white/80 text-center">Read More</p>
                         </CardFooter>
                     </Card>
@@ -91,20 +102,33 @@ export default function Hero() {
                             backgroundPosition: "center",
                         }}
                     >
-                        <div className="absolute inset-0 backdrop-blur-sm bg-black/40 flex flex-col items-center justify-center gap-3">
+                        <div
+                            className="absolute inset-0 backdrop-blur-sm bg-black/40 flex flex-col items-center justify-center gap-3">
                             <h3 className="text-2xl font-bold text-white">Curriculum 11 – 12</h3>
                         </div>
-                        <CardFooter className="cursor-pointer text-center  before:bg-white/10 border-white/20 border-1 overflow-hidden py-2 absolute before:rounded-xl rounded-large bottom-1 w-[calc(100%_-_8px)] shadow-small ml-1 z-10">
+                        <CardFooter
+                            className="cursor-pointer text-center before:bg-white/10 border-white/20 border-1 overflow-hidden py-2 absolute before:rounded-xl rounded-large bottom-1 w-[calc(100%_-_8px)] shadow-small ml-1 z-10">
                             <p className="text-tiny text-white/80 text-center">Read More</p>
                         </CardFooter>
                     </Card>
                 </div>
             </section>
 
-            <div className="absolute inset-0 -z-10">
-                <AnimatedGridPatternDemo />
-            </div>
+            {/* Floating WhatsApp Button */}
+            {/*<button*/}
+            {/*    onClick={() => setIsOpen(!isOpen)}*/}
+            {/*    className="fixed bottom-6 right-6 flex items-center justify-center w-14 h-14 bg-green-500 text-white rounded-full shadow-lg hover:bg-green-600 transition z-50"*/}
+            {/*>*/}
+            {/*    <FaWhatsapp size={28} />*/}
+            {/*</button>*/}
 
+            {/* WhatsApp Popup Chat */}
+            {/*<SchoolChat />*/}
+
+            {/* Background Pattern */}
+            <div className="absolute inset-0 -z-10">
+                <AnimatedGridPatternDemo/>
+            </div>
         </div>
     );
 }
