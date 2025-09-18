@@ -1,7 +1,8 @@
 import React from "react";
 import Image from "next/image"; // only if using Next.js
 import { FaMapMarkerAlt, FaPhoneAlt, FaEnvelope } from "react-icons/fa";
-import logo from "../assets/logo.png"; // adjust path to your logo file
+import logo from "../assets/logo.png";
+import Link from "next/link"; // adjust path to your logo file
 
 export default function Footer() {
     return (
@@ -76,8 +77,15 @@ export default function Footer() {
 
             {/* Bottom copyright */}
             <div className="border-t border-gray-400 mt-10 pt-4 text-center text-sm">
-                Copyright © 2025 YOUR SCHOOL NAME  | Develop and Designed By{" "}
-                <span className="font-semibold cursor-pointer">Shreem Software Solutions</span>
+                Copyright © 2025 YOUR SCHOOL NAME | Develop and Designed By{" "}
+                <Link
+                    href="https://shreemsoftwaresolutions.com/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-semibold cursor-pointer"
+                >
+                    Shreem Software Solutions
+                </Link>
             </div>
         </footer>
     );
