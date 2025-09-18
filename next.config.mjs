@@ -6,8 +6,8 @@ const nextConfig = {
     async rewrites() {
         return [
             {
-                source: "/krishna-academy-admin/:path*",
-                destination: "/krishna-academy-admin/:path*",
+                source: "/school-admin/:path*",
+                destination: "/school-admin/:path*",
             },
         ];
     },

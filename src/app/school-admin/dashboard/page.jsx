@@ -10,7 +10,7 @@ export default function DashboardPage() {
     useEffect(() => {
         const token = sessionStorage.getItem("admin_token"); // ✅ fixed
         if (!token) {
-            router.replace("/krishna-academy-admin/login");
+            router.replace("/school-admin/login");
         }
     }, [router]);
 

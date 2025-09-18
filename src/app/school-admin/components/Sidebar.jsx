@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import React, {useState, useEffect} from "react";
+import {useRouter} from "next/navigation";
 import {
     Sidebar,
     SidebarContent,
@@ -29,10 +29,10 @@ import {
     Files,
 } from "lucide-react";
 
-import AdminHeader from "@/app/krishna-academy-admin/components/Header";
+import AdminHeader from "@/app/school-admin/components/Header";
 import Image from "next/image";
 import logo from "@/assets/logo.png";
-import AllPages from "@/app/krishna-academy-admin/components/AllPages";
+import AllPages from "@/app/school-admin/components/AllPages";
 
 export default function SidebarDashboard() {
     const router = useRouter();
@@ -59,23 +59,23 @@ export default function SidebarDashboard() {
         setToken(storedToken);
 
         if (!storedToken) {
-            router.replace("/krishna-academy-admin/login");
+            router.replace("/school-admin/login");
         }
     }, [router]);
 
     const handleLogout = () => {
         sessionStorage.removeItem("admin_token");
-        router.replace("/krishna-academy-admin/login");
+        router.replace("/school-admin/login");
     };
 
     const toggleMenu = (title) => {
-        setOpenMenus((prev) => ({ ...prev, [title]: !prev[title] }));
+        setOpenMenus((prev) => ({...prev, [title]: !prev[title]}));
     };
 
     const items = [
-        { title: "Home", icon: Home },
-        { title: "Mandatory Disclosure", icon: Files },
-        { title: "Faculties", icon: User },
+        {title: "Home", icon: Home},
+        {title: "Mandatory Disclosure", icon: Files},
+        {title: "Faculties", icon: User},
         {
             title: "Admission",
             icon: GraduationCap,
@@ -111,7 +111,7 @@ export default function SidebarDashboard() {
             icon: Award,
             children: ["Award List"],
         },
-        { title: "Contact", icon: PhoneCall },
+        {title: "Contact", icon: PhoneCall},
     ];
 
     const renderMenu = (menuItems) =>
@@ -146,13 +146,13 @@ export default function SidebarDashboard() {
                             className="cursor-pointer flex justify-between items-center"
                         >
                             <div className="flex items-center gap-2">
-                                {item.icon && <item.icon className="h-5 w-5" />}
+                                {item.icon && <item.icon className="h-5 w-5"/>}
                                 <span>{item.title}</span>
                             </div>
                             {isOpen ? (
-                                <ChevronDown className="h-4 w-4" />
+                                <ChevronDown className="h-4 w-4"/>
                             ) : (
-                                <ChevronRight className="h-4 w-4" />
+                                <ChevronRight className="h-4 w-4"/>
                             )}
                         </SidebarMenuButton>
                         {isOpen && (
@@ -172,7 +172,7 @@ export default function SidebarDashboard() {
                         }}
                         className="cursor-pointer"
                     >
-                        {item.icon && <item.icon className="h-5 w-5" />}
+                        {item.icon && <item.icon className="h-5 w-5"/>}
                         <span>{item.title}</span>
                     </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -195,8 +195,8 @@ export default function SidebarDashboard() {
                                     className="rounded-full"
                                 />
                                 <span className="group-data-[collapsible=icon]:hidden">
-                  Krishna Academy
-                </span>
+                               SCHOOL NAME
+                                </span>
                             </SidebarGroupLabel>
 
                             <SidebarGroupContent>
@@ -213,7 +213,7 @@ export default function SidebarDashboard() {
                                     onClick={handleLogout}
                                     className="flex items-center gap-2 px-4 py-2 bg-sky-800 text-white rounded-md hover:bg-sky-900 hover:text-white cursor-pointer"
                                 >
-                                    <LogOut className="h-5 w-5" />
+                                    <LogOut className="h-5 w-5"/>
                                     Logout
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
@@ -223,13 +223,13 @@ export default function SidebarDashboard() {
 
                 {/* Main Content */}
                 <main className="flex-1 flex flex-col">
-                    <AdminHeader />
+                    <AdminHeader/>
                     <div className="p-6 flex-1 overflow-auto">
                         <div className="flex justify-between items-center mb-6">
                             <h1 className="text-2xl font-bold">{activePage}</h1>
-                            <SidebarTrigger />
+                            <SidebarTrigger/>
                         </div>
-                        <AllPages activePage={activePage} />
+                        <AllPages activePage={activePage}/>
                     </div>
                 </main>
             </div>

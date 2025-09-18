@@ -1,7 +1,7 @@
 import React from "react";
 import Image from "next/image"; // only if using Next.js
 import { FaMapMarkerAlt, FaPhoneAlt, FaEnvelope } from "react-icons/fa";
-import logo from "../assets/logo1.webp"; // adjust path to your logo file
+import logo from "../assets/logo.png"; // adjust path to your logo file
 
 export default function Footer() {
     return (
@@ -21,30 +21,22 @@ export default function Footer() {
                     </div>
 
                     <h2 className="text-lg font-semibold mb-4">KNOW ABOUT US</h2>
-                    <p className="text-sm leading-relaxed mb-6">
-                        The KRISHNA ACADEMY aims to enable all the students to achieve their
-                        full potential academically, physically and spiritually.
-                    </p>
 
                     <div className="space-y-4 text-sm">
                         <div>
                             <p className="flex items-start gap-2">
                                 <FaMapMarkerAlt className="mt-1" />
-                                KRISHANA ACADEMY DHARGAON <br />
-                                TEHSIL MAHESHWAR <br />
-                                DISTRICT KHARGONE <br />
-                                Pin 451221 <br />
-                                MADHYA PRADESH
+                               ADDRESS
                             </p>
                         </div>
                         <div>
                             <p className="flex items-center gap-2">
-                                <FaPhoneAlt /> +91-8120709899, +91-8717877855
+                                <FaPhoneAlt /> +91 987654321
                             </p>
                         </div>
                         <div>
                             <p className="flex items-center gap-2">
-                                <FaEnvelope /> krishna.dhargaon@gmail.com
+                                <FaEnvelope /> YOUR_SCHOOL_NAME@gmail.com
                             </p>
                         </div>
                     </div>
@@ -84,7 +76,7 @@ export default function Footer() {
 
             {/* Bottom copyright */}
             <div className="border-t border-gray-400 mt-10 pt-4 text-center text-sm">
-                Copyright © 2025 Krishna Academy Dhargaon | Develop and Designed By{" "}
+                Copyright © 2025 YOUR SCHOOL NAME  | Develop and Designed By{" "}
                 <span className="font-semibold cursor-pointer">Shreem Software Solutions</span>
             </div>
         </footer>

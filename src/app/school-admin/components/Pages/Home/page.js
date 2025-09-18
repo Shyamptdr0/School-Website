@@ -1,5 +1,5 @@
 import React from 'react';
-import NoticeAdmin from "@/app/krishna-academy-admin/components/NoticeAdmin";
+import NoticeAdmin from "@/app/school-admin/components/NoticeAdmin";
 
 export default function HomePage() {
   return (

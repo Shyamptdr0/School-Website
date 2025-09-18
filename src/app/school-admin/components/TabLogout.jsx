@@ -27,7 +27,7 @@ export default function TabLogoutPrompt() {
 
     const handleLogout = () => {
         setIsClosing(true); // allow unload
-        signOut({ redirect: true, callbackUrl: "/krishna-academy-admin/login" });
+        signOut({ redirect: true, callbackUrl: "/school-admin/login" });
     };
 
     const handleCancel = () => {

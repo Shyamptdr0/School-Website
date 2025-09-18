@@ -1,4 +1,4 @@
-// app/krishna-academy-admin/ProtectedRoute.jsx
+// app/school-admin/ProtectedRoute.jsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -12,7 +12,7 @@ export default function ProtectedRoute({ children }) {
         const session = sessionStorage.getItem("admin-active");
 
         if (!session) {
-            router.replace("/krishna-academy-admin/login"); // redirect to login if no session
+            router.replace("/school-admin/login"); // redirect to login if no session
         } else {
             setLoading(false);
         }

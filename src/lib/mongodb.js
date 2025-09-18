@@ -19,7 +19,7 @@ export const connectMongoose = async () => {
         isConnected = true;
         console.log("✅ Connected to MongoDB");
 
-        // Ensure default krishna-academy-admin exists only once after connection
+        // Ensure default school-admin exists only once after connection
         await ensureDefaultAdmin();
 
         return conn;
@@ -35,7 +35,7 @@ async function ensureDefaultAdmin() {
         const defaultAdminPass = process.env.DEFAULT_ADMIN_PASS;
 
         if (!defaultAdminEmail || !defaultAdminPass) {
-            console.warn("⚠️ Default krishna-academy-admin credentials missing in .env");
+            console.warn("⚠️ Default school-admin credentials missing in .env");
             return;
         }
 
@@ -49,9 +49,9 @@ async function ensureDefaultAdmin() {
             });
             console.log(`👤 Default admin created: ${defaultAdminEmail}`);
         } else {
-            console.log("👤 Default krishna-academy-admin already exists");
+            console.log("👤 Default school-admin already exists");
         }
     } catch (err) {
-        console.error("❌ Error ensuring default krishna-academy-admin:", err);
+        console.error("❌ Error ensuring default school-admin:", err);
     }
 }

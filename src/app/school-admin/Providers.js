@@ -14,7 +14,7 @@ export function AuthProvider({ children }) {
         if (typeof window === "undefined") return;
 
         // Skip check for login page
-        if (pathname === "/krishna-academy-admin/login") {
+        if (pathname === "/school-admin/login") {
             setLoading(false);
             return;
         }
@@ -23,7 +23,7 @@ export function AuthProvider({ children }) {
 
         if (!token) {
             setIsAuthed(false);
-            router.replace("/krishna-academy-admin/login");
+            router.replace("/school-admin/login");
         } else {
             setIsAuthed(true);
         }
@@ -40,7 +40,7 @@ export function AuthProvider({ children }) {
     }
 
     // 🛑 Prevent children if not authed
-    if (!isAuthed && pathname !== "/krishna-academy-admin/login") {
+    if (!isAuthed && pathname !== "/school-admin/login") {
         return null;
     }
 

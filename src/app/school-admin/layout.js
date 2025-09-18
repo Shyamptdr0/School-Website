@@ -4,9 +4,9 @@ import { AuthProvider } from "./Providers";
 export const metadata = {
     title: "Admin Panel",
     icons: {
-        icon: "/logo1.webp",   // 👈 WebP favicon
-        shortcut: "/logo1.webp",
-        apple: "/logo1.webp",
+        icon: "/logo.webp",   // 👈 WebP favicon
+        shortcut: "/logo.webp",
+        apple: "/logo.webp",
     },
 };;
 export const template = "empty";

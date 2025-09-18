@@ -1,45 +1,38 @@
-import OpenAI from "openai";
+import schoolData from "../../../data/school-info.json";
 
-export default async function handler(req, res) {
-    if (req.method !== "POST") return res.status(405).end();
+export async function POST(req) {
+    const body = await req.json();
+    const { message } = body;
 
-    const { message } = req.body;
-    const text = message.toLowerCase();
+    const query = message.toLowerCase();
+    let reply = "Sorry, I could not find information about that.";
+    let suggestions = ["Admission Process", "Fees Structure", "Facilities", "Contact"]; // default
 
-    // Default rule-based reply
-    let reply =
-        "🙏 Hello! Please ask about 'admission', 'fees', or 'contact' for Krishna Academy.";
-
-    if (text.includes("admission")) {
-        reply =
-            "📚 Admission Info: Admissions are open! Visit our office Mon–Fri, 9 AM–3 PM or check our website under Admissions.";
-    } else if (text.includes("fees")) {
-        reply =
-            "💰 Fee Details: The fee structure is available on our website or at the school office.";
-    } else if (text.includes("contact")) {
-        reply =
-            "📞 Contact Info: Call us at +91-9876543210 or visit Krishna Academy, Dhargoan.";
+    if (query.includes("admission")) {
+        reply = schoolData.admission;
+        suggestions = ["Fees Structure", "Facilities", "Contact"];
+    } else if (query.includes("fee") || query.includes("fees")) {
+        reply = schoolData.fees;
+        suggestions = ["Admission Process", "Timings", "Contact"];
+    } else if (query.includes("time") || query.includes("timing")) {
+        reply = schoolData.timings;
+        suggestions = ["Admission Process", "Fees Structure", "Facilities"];
+    } else if (query.includes("contact")) {
+        reply = `Phone: ${schoolData.contact}, Email: ${schoolData.email}`;
+        suggestions = ["Address", "Facilities", "Admission Process"];
+    } else if (query.includes("facility") || query.includes("facilities")) {
+        reply = schoolData.facilities;
+        suggestions = ["Fees Structure", "Timings", "Contact"];
+    } else if (query.includes("address") || query.includes("location")) {
+        reply = schoolData.address;
+        suggestions = ["Contact", "Admission Process", "Facilities"];
+    } else if (query.includes("name")) {
+        reply = schoolData.name;
+        suggestions = ["Address", "Timings", "Facilities"];
     }
 
-    try {
-        if (process.env.OPENAI_API_KEY) {
-            const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-            const response = await openai.chat.completions.create({
-                model: "gpt-4o-mini",
-                messages: [
-                    {
-                        role: "system",
-                        content:
-                            "You are a helpful assistant for Krishna Academy School. Answer only school-related queries (admission, fees, contact, events, facilities).",
-                    },
-                    { role: "user", content: message },
-                ],
-            });
-            reply = response.choices[0].message.content;
-        }
-    } catch (error) {
-        console.error("OpenAI error:", error.message);
-    }
-
-    res.json({ reply });
+    return new Response(JSON.stringify({ reply, suggestions }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+    });
 }
